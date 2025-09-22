@@ -22,13 +22,25 @@ namespace TemperatureMonitor
 
         static void Main(string[] args)
         {
+            SetProcessDPIAware();
+
             StartProcess();
+
+            notifyIcon.ContextMenuStrip = GetMenu();
 
             notifyIcon.Visible = true;
 
-            Application.Run();
+            Application.ApplicationExit += new EventHandler(Close);
 
+            Application.Run();
+        }
+
+        public static void Close(object sender, EventArgs e)
+        {
             computer.Close();
+
+            notifyIcon.Icon.Dispose();
+            notifyIcon.Dispose();
         }
 
         public static void StartProcess()
@@ -59,12 +71,26 @@ namespace TemperatureMonitor
 
         public static Icon GetIcon(int value)
         {
-            Bitmap bitmap = new Bitmap(32, 32);
+            int size = 32;
+
+            Bitmap bitmap = new Bitmap(size, size);
 
             using (Graphics graphics = Graphics.FromImage(bitmap))
             {
-                Font font = new Font("Roboto", 16, FontStyle.Bold);
-                graphics.DrawString(value.ToString(), font, Brushes.White, new PointF(4, 4));
+                string text = value.ToString();
+
+                using (Font font = new Font("Roboto", 24, FontStyle.Bold, GraphicsUnit.Pixel))
+                {
+                    // Measure text size
+                    SizeF textSize = graphics.MeasureString(text, font);
+
+                    // Compute centered position
+                    float x = (size - textSize.Width) / 2;
+                    float y = (size - textSize.Height) / 2;
+
+                    // Draw centered text
+                    graphics.DrawString(text, font, Brushes.White, x, y);
+                }
             }
 
             IntPtr Hicon = bitmap.GetHicon();
@@ -76,5 +102,79 @@ namespace TemperatureMonitor
 
         [System.Runtime.InteropServices.DllImport("user32.dll", CharSet = CharSet.Auto)]
         extern static bool DestroyIcon(IntPtr handle);
+
+        public static ContextMenuStrip GetMenu()
+        {
+            ContextMenuStrip menu = new ContextMenuStrip();
+
+            // ===== Temperature Unit Submenu =====
+            ToolStripMenuItem tempMenu = new ToolStripMenuItem("Temperature Unit");
+
+            ToolStripMenuItem celsiusItem = new ToolStripMenuItem("Celsius") { CheckOnClick = true };
+            ToolStripMenuItem fahrenheitItem = new ToolStripMenuItem("Fahrenheit") { CheckOnClick = true };
+
+            // Make them behave like radio buttons
+            celsiusItem.Click += (s, e) =>
+            {
+                celsiusItem.Checked = true;
+                fahrenheitItem.Checked = false;
+                Console.WriteLine("Temperature Unit: Celsius");
+            };
+
+            fahrenheitItem.Click += (s, e) =>
+            {
+                celsiusItem.Checked = false;
+                fahrenheitItem.Checked = true;
+                Console.WriteLine("Temperature Unit: Fahrenheit");
+            };
+
+            // Default selection
+            celsiusItem.Checked = true;
+
+            tempMenu.DropDownItems.Add(celsiusItem);
+            tempMenu.DropDownItems.Add(fahrenheitItem);
+            menu.Items.Add(tempMenu);
+
+            // ===== Update Interval Submenu =====
+            ToolStripMenuItem intervalMenu = new ToolStripMenuItem("Update Interval");
+
+            int[] intervals = { 250, 1000, 3000, 5000, 10000 }; // in ms
+            foreach (var ms in intervals)
+            {
+                string label = ms < 1000 ? $"{ms} ms" : $"{ms / 1000} s";
+                ToolStripMenuItem item = new ToolStripMenuItem(label) { CheckOnClick = true };
+
+                item.Click += (s, e) =>
+                {
+                    // Uncheck all siblings
+                    foreach (ToolStripMenuItem sibling in intervalMenu.DropDownItems)
+                        sibling.Checked = false;
+
+                    item.Checked = true;
+                    Console.WriteLine($"Update Interval: {label}");
+                };
+
+                intervalMenu.DropDownItems.Add(item);
+            }
+
+            // Default selection: 1s
+            ((ToolStripMenuItem)intervalMenu.DropDownItems[1]).Checked = true;
+
+            menu.Items.Add(intervalMenu);
+
+            // ===== Exit =====
+            ToolStripMenuItem exitItem = new ToolStripMenuItem("Exit");
+            exitItem.Click += (s, e) =>
+            {
+                notifyIcon.Visible = false;
+                Application.Exit();
+            };
+            menu.Items.Add(exitItem);
+
+            return menu;
+        }
+
+        [DllImport("user32.dll")]
+        private static extern bool SetProcessDPIAware();
     }
 }
