@@ -2,65 +2,48 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using LibreHardwareMonitor.Hardware;
 
 namespace TemperatureMonitor
 {
     internal class Program
     {
+        static Computer computer = new Computer
+        {
+            IsCpuEnabled = true
+        };
+
         static void Main(string[] args)
         {
-            Computer computer = new Computer
-            {
-                IsCpuEnabled = true,
-                IsGpuEnabled = true,
-                IsMemoryEnabled = true,
-                IsMotherboardEnabled = true,
-                IsControllerEnabled = true,
-                IsNetworkEnabled = true,
-                IsStorageEnabled = true
-            };
+            StartProcess();
 
-            computer.Open();
-            computer.Accept(new UpdateVisitor());
+            
 
-            foreach (IHardware hardware in computer.Hardware)
-            {
-                Console.WriteLine("Hardware: {0}", hardware.Name);
-
-                foreach (IHardware subhardware in hardware.SubHardware)
-                {
-                    Console.WriteLine("\tSubhardware: {0}", subhardware.Name);
-
-                    foreach (ISensor sensor in subhardware.Sensors)
-                    {
-                        Console.WriteLine("\t\tSensor: {0}, value: {1}, type: {2}", sensor.Name, sensor.Value, sensor.SensorType);
-                    }
-                }
-
-                foreach (ISensor sensor in hardware.Sensors)
-                {
-                    Console.WriteLine("\tSensor: {0}, value: {1}, type: {2}", sensor.Name, sensor.Value, sensor.SensorType);
-                }
-            }
+            Console.ReadLine();
 
             computer.Close();
         }
-    }
 
-    public class UpdateVisitor : IVisitor
-    {
-        public void VisitComputer(IComputer computer)
+        public static void StartProcess()
         {
-            computer.Traverse(this);
+            computer.Open();
+
+            new Timer(GetTemperature, null, 0, 1000);
         }
-        public void VisitHardware(IHardware hardware)
+
+        public static void GetTemperature(object state)
         {
-            hardware.Update();
-            foreach (IHardware subHardware in hardware.SubHardware) subHardware.Accept(this);
+            foreach (IHardware hardware in computer.Hardware)
+            {
+                hardware.Update();
+
+                ISensor sensor = hardware.Sensors.First(s => s.Name.Equals("Core Average"));
+
+                Console.WriteLine($"{sensor.Name}, {sensor.SensorType}, {sensor.Value}");
+            }
         }
-        public void VisitSensor(ISensor sensor) { }
-        public void VisitParameter(IParameter parameter) { }
     }
 }
