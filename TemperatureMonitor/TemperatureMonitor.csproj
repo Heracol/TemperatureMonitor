@@ -83,6 +83,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ColorJsonConverter.cs" />
     <Compile Include="FontSize.cs" />
     <Compile Include="HardwareMonitor.cs" />
     <Compile Include="IconGenerator.cs" />

@@ -44,7 +44,7 @@ namespace TemperatureMonitor
 
         private void UpdateTemperature(object state)
         {
-            UpdateIcon(cpuIcon, hardwareMonitor.GetCpuTemperature(), Color.Transparent, Color.White, settings.FontSizeValue, settings.ShowDegreeSymbol);
+            UpdateIcon(cpuIcon, hardwareMonitor.GetCpuTemperature(), settings.CpuBackgroundColor, settings.CpuTextColor, settings.FontSizeValue, settings.ShowDegreeSymbol);
 
             if (settings.ShowGpu && hardwareMonitor.HasGpu)
                 UpdateIcon(gpuIcon, hardwareMonitor.GetGpuTemperature(), Color.Transparent, Color.LightGreen, settings.FontSizeValue, settings.ShowDegreeSymbol);
@@ -70,22 +70,20 @@ namespace TemperatureMonitor
         {
             ContextMenuStrip menu = new ContextMenuStrip();
 
-            // Show GPU
+            // ===== Show GPU =====
             var gpuItem = new ToolStripMenuItem("Show GPU")
             {
                 Enabled = hardwareMonitor.HasGpu,
                 CheckOnClick = true,
                 Checked = settings.ShowGpu
             };
-
             gpuItem.CheckedChanged += (s, e) =>
             {
                 settings.ShowGpu = gpuItem.Checked;
             };
-            
             menu.Items.Add(gpuItem);
 
-            // Temperature Unit
+            // ===== Temperature Unit =====
             var unitMenu = new ToolStripMenuItem("Temperature Unit");
             var celsiusItem = new ToolStripMenuItem("Celsius") { CheckOnClick = true, Checked = !settings.InFahrenheit };
             var fahrenheitItem = new ToolStripMenuItem("Fahrenheit") { CheckOnClick = true, Checked = settings.InFahrenheit };
@@ -93,133 +91,151 @@ namespace TemperatureMonitor
             celsiusItem.Click += (s, e) =>
             {
                 settings.InFahrenheit = false;
-
                 celsiusItem.Checked = true;
                 fahrenheitItem.Checked = false;
             };
-
             fahrenheitItem.Click += (s, e) =>
             {
                 settings.InFahrenheit = true;
-
                 celsiusItem.Checked = false;
                 fahrenheitItem.Checked = true;
             };
-
             unitMenu.DropDownItems.Add(celsiusItem);
             unitMenu.DropDownItems.Add(fahrenheitItem);
-
             menu.Items.Add(unitMenu);
 
-            // Update Interval
+            // ===== Update Interval =====
             var intervalMenu = new ToolStripMenuItem("Update Interval");
-
             int[] intervals = { 250, 1000, 3000, 5000, 10000 };
 
             foreach (var ms in intervals)
             {
                 string label = ms < 1000 ? $"{ms} ms" : $"{ms / 1000} s";
                 var item = new ToolStripMenuItem(label) { CheckOnClick = true };
-
-                if (ms == settings.UpdateInterval)
-                    item.Checked = true;
+                if (ms == settings.UpdateInterval) item.Checked = true;
 
                 item.Click += (s, e) =>
                 {
                     foreach (ToolStripMenuItem sibling in intervalMenu.DropDownItems)
                         sibling.Checked = false;
-
                     item.Checked = true;
-
                     settings.UpdateInterval = ms;
-
                     timer?.Change(0, ms);
                 };
-
                 intervalMenu.DropDownItems.Add(item);
             }
-
             menu.Items.Add(intervalMenu);
 
-            // Font Size
-            var fontMenu = new ToolStripMenuItem("Font Size");
+            // ===== Options / Visuals =====
+            var visualsMenu = new ToolStripMenuItem("Visuals");
 
+            // --- Font Size ---
+            var fontMenu = new ToolStripMenuItem("Font Size");
             var largeItem = new ToolStripMenuItem("Large") { CheckOnClick = true };
             var mediumItem = new ToolStripMenuItem("Medium") { CheckOnClick = true };
             var smallItem = new ToolStripMenuItem("Small") { CheckOnClick = true };
 
             switch (settings.FontSizeValue)
             {
-                case FontSize.Large:
-                    largeItem.Checked = true;
-                    break;
-                case FontSize.Medium:
-                    mediumItem.Checked = true;
-                    break;
-                case FontSize.Small:
-                    smallItem.Checked = true;
-                    break;
+                case FontSize.Large: largeItem.Checked = true; break;
+                case FontSize.Medium: mediumItem.Checked = true; break;
+                case FontSize.Small: smallItem.Checked = true; break;
             }
 
-            largeItem.Click += (s, e) =>
-            {
-                settings.FontSizeValue = FontSize.Large;
-
-                largeItem.Checked = true;
-                mediumItem.Checked = false;
-                smallItem.Checked = false;
-            };
-
-            mediumItem.Click += (s, e) =>
-            {
-                settings.FontSizeValue = FontSize.Medium;
-
-                largeItem.Checked = false;
-                mediumItem.Checked = true;
-                smallItem.Checked = false;
-            };
-
-            smallItem.Click += (s, e) =>
-            {
-                settings.FontSizeValue = FontSize.Small;
-
-                largeItem.Checked = false;
-                mediumItem.Checked = false;
-                smallItem.Checked = true;
-            };
+            largeItem.Click += (s, e) => { settings.FontSizeValue = FontSize.Large; largeItem.Checked = true; mediumItem.Checked = false; smallItem.Checked = false; };
+            mediumItem.Click += (s, e) => { settings.FontSizeValue = FontSize.Medium; largeItem.Checked = false; mediumItem.Checked = true; smallItem.Checked = false; };
+            smallItem.Click += (s, e) => { settings.FontSizeValue = FontSize.Small; largeItem.Checked = false; mediumItem.Checked = false; smallItem.Checked = true; };
 
             fontMenu.DropDownItems.Add(largeItem);
             fontMenu.DropDownItems.Add(mediumItem);
             fontMenu.DropDownItems.Add(smallItem);
+            visualsMenu.DropDownItems.Add(fontMenu);
 
-            menu.Items.Add(fontMenu);
+            // --- Show Degree Symbol ---
+            var showDegreeItem = new ToolStripMenuItem("Show Degree Symbol") { CheckOnClick = true, Checked = settings.ShowDegreeSymbol };
+            showDegreeItem.CheckedChanged += (s, e) => { settings.ShowDegreeSymbol = showDegreeItem.Checked; };
+            visualsMenu.DropDownItems.Add(showDegreeItem);
 
-            // Show Degree Symbol
-            var showDegreeSymbol = new ToolStripMenuItem("Show Degree Symbol")
+            // --- Background Color ---
+            var bgColorMenu = new ToolStripMenuItem("Background Color");
+            string[] bgPresets = { "Transparent", "Dark Blue", "Custom..." };
+
+            foreach (var c in bgPresets)
             {
-                CheckOnClick = true,
-                Checked = settings.ShowDegreeSymbol
-            };
+                var item = new ToolStripMenuItem(c);
 
-            showDegreeSymbol.CheckedChanged += (s, e) =>
+                item.Click += (s, e) =>
+                {
+                    if (c == "Custom...")
+                    {
+                        using (var dlg = new ColorDialog())
+                        {
+                            dlg.FullOpen = true;
+                            dlg.Color = settings.CpuBackgroundColor; // current color
+                            if (dlg.ShowDialog() == DialogResult.OK)
+                                settings.CpuBackgroundColor = dlg.Color;
+                        }
+                    }
+                    else if (c == "Transparent")
+                    {
+                        settings.CpuBackgroundColor = Color.FromArgb(0, 0, 0, 0);
+                    }
+                    else if (c == "Dark Blue")
+                    {
+                        settings.CpuBackgroundColor = Color.FromArgb(255, 0, 0, 139);
+                    }
+                };
+
+                bgColorMenu.DropDownItems.Add(item);
+            }
+
+            // --- Text Color ---
+            var textColorMenu = new ToolStripMenuItem("Text Color");
+            string[] textPresets = { "White", "Custom..." };
+
+            foreach (var c in textPresets)
             {
-                settings.ShowDegreeSymbol = showDegreeSymbol.Checked;
-            };
+                var item = new ToolStripMenuItem(c) { CheckOnClick = true };
 
-            menu.Items.Add(showDegreeSymbol);
+                item.Click += (s, e) =>
+                {
+                    foreach (ToolStripMenuItem sibling in textColorMenu.DropDownItems)
+                        sibling.Checked = false;
+                    item.Checked = true;
 
-            // Exit
+                    if (c == "Custom...")
+                    {
+                        using (var dlg = new ColorDialog())
+                        {
+                            dlg.FullOpen = true;
+                            dlg.Color = settings.CpuTextColor; // current color
+                            if (dlg.ShowDialog() == DialogResult.OK)
+                                settings.CpuTextColor = dlg.Color;
+                        }
+                    }
+                    else if (c == "White")
+                    {
+                        settings.CpuTextColor = Color.FromArgb(255, 255, 255, 255);
+                    }
+                };
+
+                textColorMenu.DropDownItems.Add(item);
+            }
+
+            // Add to your main menu or Visuals submenu
+            visualsMenu.DropDownItems.Add(bgColorMenu);
+            visualsMenu.DropDownItems.Add(textColorMenu);
+
+            menu.Items.Add(visualsMenu);
+
+            // ===== Exit =====
             var exitItem = new ToolStripMenuItem("Exit");
-
-            exitItem.Click += (s, e) => 
-            { 
-                Application.Exit(); 
-            };
-
+            exitItem.Click += (s, e) => { Application.Exit(); };
             menu.Items.Add(exitItem);
 
             return menu;
         }
+
 
         public void Close()
         {

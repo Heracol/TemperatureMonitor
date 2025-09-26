@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -69,11 +70,36 @@ namespace TemperatureMonitor
             }
         }
 
+        private Color cpuBackgroundColor = Color.Transparent;
+        public Color CpuBackgroundColor
+        {
+            get => cpuBackgroundColor;
+            set
+            {
+                cpuBackgroundColor = value;
+                Save();
+            }
+        }
+
+        private Color cpuTextColor = Color.White;
+        public Color CpuTextColor
+        {
+            get => cpuTextColor;
+            set
+            {
+                cpuTextColor = value;
+                Save();
+            }
+        }
+
         public void Save()
         {
             try
             {
-                string json = JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true });
+                JsonSerializerOptions options = new JsonSerializerOptions { WriteIndented = true };
+                options.Converters.Add(new ColorJsonConverter());
+
+                string json = JsonSerializer.Serialize(this, options);
                 File.WriteAllText(filePath, json);
             } 
             catch { }
@@ -86,8 +112,11 @@ namespace TemperatureMonitor
 
             try
             {
+                JsonSerializerOptions options = new JsonSerializerOptions { WriteIndented = true };
+                options.Converters.Add(new ColorJsonConverter());
+
                 string json = File.ReadAllText(filePath);
-                Settings loaded = JsonSerializer.Deserialize<Settings>(json);
+                Settings loaded = JsonSerializer.Deserialize<Settings>(json, options);
                 
                 if (loaded != null)
                 {
