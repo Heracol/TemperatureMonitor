@@ -44,10 +44,10 @@ namespace TemperatureMonitor
 
         private void UpdateTemperature(object state)
         {
-            UpdateIcon(cpuIcon, hardwareMonitor.GetCpuTemperature(), Color.Transparent, Color.White, FontSize.Medium, false);
+            UpdateIcon(cpuIcon, hardwareMonitor.GetCpuTemperature(), Color.Transparent, Color.White, settings.FontSizeValue, settings.ShowDegreeSymbol);
 
             if (settings.ShowGpu && hardwareMonitor.HasGpu)
-                UpdateIcon(gpuIcon, hardwareMonitor.GetGpuTemperature(), Color.Transparent, Color.LightGreen, FontSize.Medium, false);
+                UpdateIcon(gpuIcon, hardwareMonitor.GetGpuTemperature(), Color.Transparent, Color.LightGreen, settings.FontSizeValue, settings.ShowDegreeSymbol);
             else
                 gpuIcon.Icon = null;
         }
@@ -140,6 +140,73 @@ namespace TemperatureMonitor
             }
 
             menu.Items.Add(intervalMenu);
+
+            // Font Size
+            var fontMenu = new ToolStripMenuItem("Font Size");
+
+            var largeItem = new ToolStripMenuItem("Large") { CheckOnClick = true };
+            var mediumItem = new ToolStripMenuItem("Medium") { CheckOnClick = true };
+            var smallItem = new ToolStripMenuItem("Small") { CheckOnClick = true };
+
+            switch (settings.FontSizeValue)
+            {
+                case FontSize.Large:
+                    largeItem.Checked = true;
+                    break;
+                case FontSize.Medium:
+                    mediumItem.Checked = true;
+                    break;
+                case FontSize.Small:
+                    smallItem.Checked = true;
+                    break;
+            }
+
+            largeItem.Click += (s, e) =>
+            {
+                settings.FontSizeValue = FontSize.Large;
+
+                largeItem.Checked = true;
+                mediumItem.Checked = false;
+                smallItem.Checked = false;
+            };
+
+            mediumItem.Click += (s, e) =>
+            {
+                settings.FontSizeValue = FontSize.Medium;
+
+                largeItem.Checked = false;
+                mediumItem.Checked = true;
+                smallItem.Checked = false;
+            };
+
+            smallItem.Click += (s, e) =>
+            {
+                settings.FontSizeValue = FontSize.Small;
+
+                largeItem.Checked = false;
+                mediumItem.Checked = false;
+                smallItem.Checked = true;
+            };
+
+            fontMenu.DropDownItems.Add(largeItem);
+            fontMenu.DropDownItems.Add(mediumItem);
+            fontMenu.DropDownItems.Add(smallItem);
+
+            menu.Items.Add(fontMenu);
+
+            // Show Degree Symbol
+            var showDegreeSymbol = new ToolStripMenuItem("Show Degree Symbol")
+            {
+                CheckOnClick = true,
+                Checked = settings.ShowDegreeSymbol
+            };
+
+            showDegreeSymbol.CheckedChanged += (s, e) =>
+            {
+                settings.ShowDegreeSymbol = showDegreeSymbol.Checked;
+            };
+
+            menu.Items.Add(showDegreeSymbol);
 
             // Exit
             var exitItem = new ToolStripMenuItem("Exit");

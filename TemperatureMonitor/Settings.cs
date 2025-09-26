@@ -58,6 +58,17 @@ namespace TemperatureMonitor
             }
         }
 
+        private bool showDegreeSymbol = false;
+        public bool ShowDegreeSymbol
+        {
+            get => showDegreeSymbol;
+            set
+            {
+                showDegreeSymbol = value;
+                Save();
+            }
+        }
+
         public void Save()
         {
             try
@@ -83,6 +94,8 @@ namespace TemperatureMonitor
                     showGpu = loaded.ShowGpu;
                     inFahrenheit = loaded.InFahrenheit;
                     updateInterval = loaded.UpdateInterval;
+                    fontSize = loaded.fontSize;
+                    showDegreeSymbol = loaded.showDegreeSymbol;
                 }
             }
             catch { }
