@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -6,12 +7,14 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace TemperatureMonitor
 {
     public class TrayApp
     {
+        private const string RunKey = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run";
+        private const string AppName = "TemperatureMonitor";
+
         private readonly NotifyIcon cpuIcon = new NotifyIcon();
         private readonly NotifyIcon gpuIcon = new NotifyIcon();
 
@@ -84,6 +87,20 @@ namespace TemperatureMonitor
                 settings.ShowGpu = gpuItem.Checked;
             };
             menu.Items.Add(gpuItem);
+
+            // ===== Start With Windows =====
+            var autoStartItem = new ToolStripMenuItem("Start with Windows")
+            {
+                CheckOnClick = true,
+                Checked = IsAutoStartEnabled()
+            };
+
+            autoStartItem.CheckedChanged += (s, e) =>
+            {
+                SetAutoStart(autoStartItem.Checked);
+            };
+
+            menu.Items.Add(autoStartItem);
 
             // ===== Temperature Unit =====
             var unitMenu = new ToolStripMenuItem("Temperature Unit");
@@ -285,6 +302,30 @@ namespace TemperatureMonitor
             }
 
             return (bgColorMenu, textColorMenu);
+        }
+
+        public static void SetAutoStart(bool enable)
+        {
+            using (RegistryKey key = Registry.CurrentUser.OpenSubKey(RunKey, true))
+            {
+                if (enable)
+                {
+                    string exePath = Application.ExecutablePath;
+                    key.SetValue(AppName, exePath);
+                }
+                else
+                {
+                    key.DeleteValue(AppName, false);
+                }
+            }
+        }
+
+        public static bool IsAutoStartEnabled()
+        {
+            using (RegistryKey key = Registry.CurrentUser.OpenSubKey(RunKey, false))
+            {
+                return key?.GetValue(AppName) != null;
+            }
         }
 
         public void Close()
