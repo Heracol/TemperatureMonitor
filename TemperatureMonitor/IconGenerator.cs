@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace TemperatureMonitor
 {
-    public static partial class IconGenerator
+    public static class IconGenerator
     {
         public static Icon CreateIcon(int value, Color background, Color foreground, FontSize fontSize, bool addDegreeSymbol)
         {

@@ -11,8 +11,7 @@ namespace TemperatureMonitor
         {
             SetProcessDPIAware();
 
-            Settings settings = new Settings();
-            settings.Load();
+            Settings settings = Settings.Load();
 
             HardwareMonitor monitor = new HardwareMonitor();
 

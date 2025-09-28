@@ -103,7 +103,7 @@ namespace TemperatureMonitor
             }
         }
 
-        private Color gpuTextColor = Color.White;
+        private Color gpuTextColor = Color.LightGreen;
         public Color GpuTextColor
         {
             get => gpuTextColor;
@@ -127,33 +127,31 @@ namespace TemperatureMonitor
             catch { }
         }
 
-        public void Load()
+        public static Settings Load()
         {
-            if (!File.Exists(filePath)) 
-                Save();
+            if (!File.Exists(filePath))
+            {
+                Settings settings = new Settings();
+                settings.Save();
+
+                return settings;
+            }
 
             try
             {
-                JsonSerializerOptions options = new JsonSerializerOptions { WriteIndented = true };
-                options.Converters.Add(new ColorJsonConverter());
+                var options = new JsonSerializerOptions
+                {
+                    Converters = { new ColorJsonConverter() }
+                };
 
                 string json = File.ReadAllText(filePath);
-                Settings loaded = JsonSerializer.Deserialize<Settings>(json, options);
-                
-                if (loaded != null)
-                {
-                    showGpu = loaded.ShowGpu;
-                    inFahrenheit = loaded.InFahrenheit;
-                    updateInterval = loaded.UpdateInterval;
-                    fontSize = loaded.fontSize;
-                    showDegreeSymbol = loaded.showDegreeSymbol;
-                    cpuBackgroundColor = loaded.cpuBackgroundColor;
-                    cpuTextColor = loaded.cpuTextColor;
-                    gpuBackgroundColor = loaded.gpuBackgroundColor;
-                    gpuTextColor = loaded.gpuTextColor;
-                }
+
+                return JsonSerializer.Deserialize<Settings>(json, options) ?? new Settings();
             }
-            catch { }
+            catch
+            {
+                return new Settings();
+            }
         }
     }
 }
