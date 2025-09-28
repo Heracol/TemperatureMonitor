@@ -12,9 +12,6 @@ namespace TemperatureMonitor
 {
     public class TrayApp
     {
-        private const string RunKey = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run";
-        private const string AppName = "TemperatureMonitor";
-
         private readonly NotifyIcon cpuIcon = new NotifyIcon();
         private readonly NotifyIcon gpuIcon = new NotifyIcon();
 
@@ -92,12 +89,12 @@ namespace TemperatureMonitor
             var autoStartItem = new ToolStripMenuItem("Start with Windows")
             {
                 CheckOnClick = true,
-                Checked = IsAutoStartEnabled()
+                Checked = AutoStart.IsAutoStartEnabled()
             };
 
             autoStartItem.CheckedChanged += (s, e) =>
             {
-                SetAutoStart(autoStartItem.Checked);
+                AutoStart.SetAutoStart(autoStartItem.Checked);
             };
 
             menu.Items.Add(autoStartItem);
@@ -302,30 +299,6 @@ namespace TemperatureMonitor
             }
 
             return (bgColorMenu, textColorMenu);
-        }
-
-        public static void SetAutoStart(bool enable)
-        {
-            using (RegistryKey key = Registry.CurrentUser.OpenSubKey(RunKey, true))
-            {
-                if (enable)
-                {
-                    string exePath = Application.ExecutablePath;
-                    key.SetValue(AppName, exePath);
-                }
-                else
-                {
-                    key.DeleteValue(AppName, false);
-                }
-            }
-        }
-
-        public static bool IsAutoStartEnabled()
-        {
-            using (RegistryKey key = Registry.CurrentUser.OpenSubKey(RunKey, false))
-            {
-                return key?.GetValue(AppName) != null;
-            }
         }
 
         public void Close()
