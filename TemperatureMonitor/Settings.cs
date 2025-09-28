@@ -92,6 +92,28 @@ namespace TemperatureMonitor
             }
         }
 
+        private Color gpuBackgroundColor = Color.Transparent;
+        public Color GpuBackgroundColor
+        {
+            get => gpuBackgroundColor;
+            set
+            {
+                gpuBackgroundColor = value;
+                Save();
+            }
+        }
+
+        private Color gpuTextColor = Color.White;
+        public Color GpuTextColor
+        {
+            get => gpuTextColor;
+            set
+            {
+                gpuTextColor = value;
+                Save();
+            }
+        }
+
         public void Save()
         {
             try
@@ -108,7 +130,7 @@ namespace TemperatureMonitor
         public void Load()
         {
             if (!File.Exists(filePath)) 
-                return;
+                Save();
 
             try
             {
@@ -125,6 +147,10 @@ namespace TemperatureMonitor
                     updateInterval = loaded.UpdateInterval;
                     fontSize = loaded.fontSize;
                     showDegreeSymbol = loaded.showDegreeSymbol;
+                    cpuBackgroundColor = loaded.cpuBackgroundColor;
+                    cpuTextColor = loaded.cpuTextColor;
+                    gpuBackgroundColor = loaded.gpuBackgroundColor;
+                    gpuTextColor = loaded.gpuTextColor;
                 }
             }
             catch { }

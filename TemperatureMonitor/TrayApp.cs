@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace TemperatureMonitor
 {
@@ -32,6 +33,7 @@ namespace TemperatureMonitor
             gpuIcon.Visible = true;
 
             cpuIcon.ContextMenuStrip = BuildCpuMenu();
+            gpuIcon.ContextMenuStrip = BuildGpuMenu();
 
             Application.ApplicationExit += (s, e) => Close();
         }
@@ -47,7 +49,7 @@ namespace TemperatureMonitor
             UpdateIcon(cpuIcon, hardwareMonitor.GetCpuTemperature(), settings.CpuBackgroundColor, settings.CpuTextColor, settings.FontSizeValue, settings.ShowDegreeSymbol);
 
             if (settings.ShowGpu && hardwareMonitor.HasGpu)
-                UpdateIcon(gpuIcon, hardwareMonitor.GetGpuTemperature(), Color.Transparent, Color.LightGreen, settings.FontSizeValue, settings.ShowDegreeSymbol);
+                UpdateIcon(gpuIcon, hardwareMonitor.GetGpuTemperature(), settings.GpuBackgroundColor, settings.GpuTextColor, settings.FontSizeValue, settings.ShowDegreeSymbol);
             else
                 gpuIcon.Icon = null;
         }
@@ -156,71 +158,11 @@ namespace TemperatureMonitor
             showDegreeItem.CheckedChanged += (s, e) => { settings.ShowDegreeSymbol = showDegreeItem.Checked; };
             visualsMenu.DropDownItems.Add(showDegreeItem);
 
-            // --- Background Color ---
-            var bgColorMenu = new ToolStripMenuItem("Background Color");
-            string[] bgPresets = { "Transparent", "Dark Blue", "Custom..." };
-
-            foreach (var c in bgPresets)
-            {
-                var item = new ToolStripMenuItem(c);
-
-                item.Click += (s, e) =>
-                {
-                    if (c == "Custom...")
-                    {
-                        using (var dlg = new ColorDialog())
-                        {
-                            dlg.FullOpen = true;
-                            dlg.Color = settings.CpuBackgroundColor; // current color
-                            if (dlg.ShowDialog() == DialogResult.OK)
-                                settings.CpuBackgroundColor = dlg.Color;
-                        }
-                    }
-                    else if (c == "Transparent")
-                    {
-                        settings.CpuBackgroundColor = Color.FromArgb(0, 0, 0, 0);
-                    }
-                    else if (c == "Dark Blue")
-                    {
-                        settings.CpuBackgroundColor = Color.FromArgb(255, 0, 0, 139);
-                    }
-                };
-
-                bgColorMenu.DropDownItems.Add(item);
-            }
-
-            // --- Text Color ---
-            var textColorMenu = new ToolStripMenuItem("Text Color");
-            string[] textPresets = { "White", "Custom..." };
-
-            foreach (var c in textPresets)
-            {
-                var item = new ToolStripMenuItem(c) { CheckOnClick = true };
-
-                item.Click += (s, e) =>
-                {
-                    foreach (ToolStripMenuItem sibling in textColorMenu.DropDownItems)
-                        sibling.Checked = false;
-                    item.Checked = true;
-
-                    if (c == "Custom...")
-                    {
-                        using (var dlg = new ColorDialog())
-                        {
-                            dlg.FullOpen = true;
-                            dlg.Color = settings.CpuTextColor; // current color
-                            if (dlg.ShowDialog() == DialogResult.OK)
-                                settings.CpuTextColor = dlg.Color;
-                        }
-                    }
-                    else if (c == "White")
-                    {
-                        settings.CpuTextColor = Color.FromArgb(255, 255, 255, 255);
-                    }
-                };
-
-                textColorMenu.DropDownItems.Add(item);
-            }
+            (ToolStripMenuItem bgColorMenu, ToolStripMenuItem textColorMenu) = BuildColorMenu(
+                settings.CpuBackgroundColor, 
+                settings.CpuTextColor, 
+                c => settings.CpuBackgroundColor = c, 
+                c => settings.CpuTextColor = c);
 
             // Add to your main menu or Visuals submenu
             visualsMenu.DropDownItems.Add(bgColorMenu);
@@ -236,6 +178,114 @@ namespace TemperatureMonitor
             return menu;
         }
 
+        public ContextMenuStrip BuildGpuMenu()
+        {
+            ContextMenuStrip menu = new ContextMenuStrip();
+
+            (ToolStripMenuItem bgColorMenu, ToolStripMenuItem textColorMenu) = BuildColorMenu(
+                settings.GpuBackgroundColor,
+                settings.GpuTextColor,
+                c => settings.GpuBackgroundColor = c,
+                c => settings.GpuTextColor = c);
+
+            menu.Items.Add(bgColorMenu);
+            menu.Items.Add(textColorMenu);
+
+            return menu;
+        }
+
+        public (ToolStripMenuItem bg, ToolStripMenuItem fg) BuildColorMenu(Color settingsBgColor, Color settingsFgColor, Action<Color> setBg, Action<Color> setFg)
+        {
+            // --- Background Color ---
+            var bgColorMenu = new ToolStripMenuItem("Background Color");
+
+            string customText = "Custom...";
+            string[] bgPresets = { "Transparent", "Dark Blue", customText };
+            bool isCustom = true;
+
+            foreach (var c in bgPresets)
+            {
+                var item = new ToolStripMenuItem(c);
+
+                if (c != customText && Color.FromName(c.Replace(" ", "")).ToArgb() == settingsBgColor.ToArgb())
+                {
+                    isCustom = false;
+                    item.Checked = true;
+                }
+
+                if (c == customText && isCustom)
+                {
+                    item.Checked = true;
+                }
+
+                item.Click += (s, e) =>
+                {
+                    if (c == customText)
+                    {
+                        using (var dlg = new ColorDialog())
+                        {
+                            dlg.FullOpen = true;
+                            dlg.Color = settingsBgColor;
+                            if (dlg.ShowDialog() == DialogResult.OK)
+                                setBg(dlg.Color);
+                        }
+                    }
+                    else
+                    {
+                        setBg(Color.FromName(c.Replace(" ", "")));
+                    }
+                };
+
+                bgColorMenu.DropDownItems.Add(item);
+            }
+
+            // --- Text Color ---
+            var textColorMenu = new ToolStripMenuItem("Text Color");
+            string[] textPresets = { "White", customText };
+            isCustom = true;
+
+            foreach (var c in textPresets)
+            {
+                var item = new ToolStripMenuItem(c) { CheckOnClick = true };
+
+                if (c != customText && Color.FromName(c.Replace(" ", "")).ToArgb() == settingsFgColor.ToArgb())
+                {
+                    isCustom = false;
+                    item.Checked = true;
+                }
+
+                if (c == customText && isCustom)
+                {
+                    item.Checked = true;
+                }
+
+                item.Click += (s, e) =>
+                {
+                    foreach (ToolStripMenuItem sibling in textColorMenu.DropDownItems)
+                        sibling.Checked = false;
+                    item.Checked = true;
+
+                    if (c == customText)
+                    {
+                        using (var dlg = new ColorDialog())
+                        {
+                            dlg.FullOpen = true;
+                            dlg.Color = settingsFgColor;
+                            if (dlg.ShowDialog() == DialogResult.OK)
+                                setFg(dlg.Color);
+                        }
+                    }
+                    else
+                    {
+                        setFg(Color.FromName(c.Replace(" ", "")));
+                    }
+                };
+
+                textColorMenu.DropDownItems.Add(item);
+            }
+
+            return (bgColorMenu, textColorMenu);
+        }
 
         public void Close()
         {
