@@ -20,7 +20,7 @@ namespace TemperatureMonitor
                 if (addDegreeSymbol)
                     text += "°";
 
-                using Font font = new Font("Segoe UI", fontSizeValue, FontStyle.Regular, GraphicsUnit.Pixel);
+                using Font font = new Font(SystemFonts.DefaultFont.FontFamily, fontSizeValue, FontStyle.Regular, GraphicsUnit.Pixel);
 
                 SizeF textSize = graphics.MeasureString(text, font);
 
