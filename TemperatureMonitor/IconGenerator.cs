@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Runtime.InteropServices;
 
 namespace TemperatureMonitor
 {
@@ -26,17 +20,16 @@ namespace TemperatureMonitor
                 if (addDegreeSymbol)
                     text += "°";
 
-                using (Font font = new Font("Segoe UI", fontSizeValue, FontStyle.Regular, GraphicsUnit.Pixel))
-                {
-                    SizeF textSize = graphics.MeasureString(text, font);
+                using Font font = new Font("Segoe UI", fontSizeValue, FontStyle.Regular, GraphicsUnit.Pixel);
 
-                    float x = (size - textSize.Width) / 2;
-                    float y = (size - textSize.Height) / 2;
+                SizeF textSize = graphics.MeasureString(text, font);
 
-                    Brush brush = new SolidBrush(foreground);
+                float x = (size - textSize.Width) / 2;
+                float y = (size - textSize.Height) / 2;
 
-                    graphics.DrawString(text, font, brush, x, y);
-                }
+                Brush brush = new SolidBrush(foreground);
+
+                graphics.DrawString(text, font, brush, x, y);
             }
 
             IntPtr hIcon = bitmap.GetHicon();

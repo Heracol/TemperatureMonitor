@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace TemperatureMonitor
 {
@@ -129,7 +122,7 @@ namespace TemperatureMonitor
 
                 string json = JsonSerializer.Serialize(this, options);
                 File.WriteAllText(filePath, json);
-            } 
+            }
             catch { }
         }
 
