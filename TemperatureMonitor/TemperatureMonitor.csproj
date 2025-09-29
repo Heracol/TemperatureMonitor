@@ -88,6 +88,7 @@
     <Compile Include="FontSize.cs" />
     <Compile Include="HardwareMonitor.cs" />
     <Compile Include="IconGenerator.cs" />
+    <Compile Include="MenuBuilder.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings.cs" />
