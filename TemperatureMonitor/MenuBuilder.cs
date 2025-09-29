@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace TemperatureMonitor
@@ -12,13 +11,15 @@ namespace TemperatureMonitor
     {
         private readonly Settings settings;
         private readonly HardwareMonitor hardwareMonitor;
-        private readonly System.Threading.Timer timer;
+        private readonly Timer timer;
+        private readonly Action update;
 
-        public MenuBuilder(Settings settings, HardwareMonitor hardwareMonitor, System.Threading.Timer timer)
+        public MenuBuilder(Settings settings, HardwareMonitor hardwareMonitor, Timer timer, Action update)
         {
             this.settings = settings;
             this.hardwareMonitor = hardwareMonitor;
             this.timer = timer;
+            this.update = update;
         }
 
         public ContextMenuStrip BuildCpuMenu()
@@ -59,6 +60,7 @@ namespace TemperatureMonitor
             gpuItem.CheckedChanged += (_, __) =>
             {
                 settings.ShowGpu = gpuItem.Checked;
+                update.Invoke();
             };
 
             return gpuItem;
@@ -93,6 +95,8 @@ namespace TemperatureMonitor
 
                 celsiusItem.Checked = true;
                 fahrenheitItem.Checked = false;
+
+                update.Invoke();
             };
 
             fahrenheitItem.Click += (_, __) =>
@@ -101,6 +105,8 @@ namespace TemperatureMonitor
 
                 celsiusItem.Checked = false;
                 fahrenheitItem.Checked = true;
+
+                update.Invoke();
             };
 
             unitMenu.DropDownItems.Add(celsiusItem);
@@ -126,7 +132,8 @@ namespace TemperatureMonitor
 
                     item.Checked = true;
                     settings.UpdateInterval = ms;
-                    timer?.Change(0, ms);
+
+                    timer.Interval = ms;
                 };
 
                 intervalMenu.DropDownItems.Add(item);
@@ -182,6 +189,8 @@ namespace TemperatureMonitor
 
             foreach (var item in items)
                 item.Checked = (item.Text == size.ToString());
+
+            update.Invoke();
         }
 
         private ToolStripMenuItem BuildShowDegreeSymbolItem()
@@ -195,6 +204,7 @@ namespace TemperatureMonitor
             showDegreeItem.CheckedChanged += (_, __) =>
             {
                 settings.ShowDegreeSymbol = showDegreeItem.Checked;
+                update.Invoke();
             };
 
             return showDegreeItem;
@@ -219,7 +229,8 @@ namespace TemperatureMonitor
             var fgColors = new Dictionary<string, Color?>
             {
                 { "White", Color.White },
-                { "Light Blue", Color.LightBlue },
+                { "Black", Color.Black },
+                { "Light Sky Blue", Color.LightSkyBlue },
                 { "Custom...", null }
             };
 
@@ -252,6 +263,7 @@ namespace TemperatureMonitor
             var fgColors = new Dictionary<string, Color?>
             {
                 { "White", Color.White },
+                { "Dark Green", Color.DarkGreen },
                 { "Light Green", Color.LightGreen },
                 { "Custom...", null }
             };
@@ -319,6 +331,8 @@ namespace TemperatureMonitor
                     {
                         setColor(color.Value);
                     }
+
+                    update.Invoke();
                 };
 
                 menu.DropDownItems.Add(item);

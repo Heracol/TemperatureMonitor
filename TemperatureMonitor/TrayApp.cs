@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace TemperatureMonitor
@@ -19,12 +17,16 @@ namespace TemperatureMonitor
 
         private readonly Settings settings;
 
-        private System.Threading.Timer timer;
+        private Timer timer;
 
         public TrayApp(HardwareMonitor hardwareMonitor, Settings settings)
         {
             this.hardwareMonitor = hardwareMonitor;
             this.settings = settings;
+
+            timer = new Timer();
+            timer.Interval = settings.UpdateInterval;
+            timer.Tick += (s, e) => UpdateTemperature();
 
             cpuIcon.Text = "CPU Temperature";
             gpuIcon.Text = "GPU Temperature";
@@ -32,7 +34,7 @@ namespace TemperatureMonitor
             cpuIcon.Visible = true;
             gpuIcon.Visible = true;
 
-            MenuBuilder menuBuilder = new MenuBuilder(settings, hardwareMonitor, timer);
+            MenuBuilder menuBuilder = new MenuBuilder(settings, hardwareMonitor, timer, UpdateTemperature);
 
             cpuIcon.ContextMenuStrip = menuBuilder.BuildCpuMenu();
             gpuIcon.ContextMenuStrip = menuBuilder.BuildGpuMenu();
@@ -42,11 +44,11 @@ namespace TemperatureMonitor
 
         public void Start()
         {
-            timer = new System.Threading.Timer(UpdateTemperature, null, 0, settings.UpdateInterval);
+            timer.Start();
             Application.Run();
         }
 
-        private void UpdateTemperature(object state)
+        private void UpdateTemperature()
         {
             UpdateIcon(cpuIcon, hardwareMonitor.GetCpuTemperature(), settings.CpuBackgroundColor, settings.CpuTextColor, settings.FontSizeValue, settings.ShowDegreeSymbol);
 
@@ -72,7 +74,8 @@ namespace TemperatureMonitor
 
         public void Close()
         {
-            timer?.Dispose();
+            timer.Stop();
+            timer.Dispose();
             
             hardwareMonitor.Close();
 
