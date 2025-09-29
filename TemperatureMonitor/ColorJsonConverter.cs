@@ -13,9 +13,10 @@ namespace TemperatureMonitor
     {
         public override Color Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            string value = reader.GetString();
-            var parts = value.Split(',');
-            if (parts.Length == 4 &&
+            string? value = reader.GetString();
+            var parts = value?.Split(',');
+
+            if (parts?.Length == 4 &&
                 byte.TryParse(parts[0], out byte a) &&
                 byte.TryParse(parts[1], out byte r) &&
                 byte.TryParse(parts[2], out byte g) &&
@@ -23,6 +24,7 @@ namespace TemperatureMonitor
             {
                 return Color.FromArgb(a, r, g, b);
             }
+
             return Color.Transparent;
         }
 

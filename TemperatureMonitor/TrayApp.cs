@@ -17,14 +17,14 @@ namespace TemperatureMonitor
 
         private readonly Settings settings;
 
-        private Timer timer;
+        private System.Windows.Forms.Timer timer;
 
         public TrayApp(HardwareMonitor hardwareMonitor, Settings settings)
         {
             this.hardwareMonitor = hardwareMonitor;
             this.settings = settings;
 
-            timer = new Timer();
+            timer = new System.Windows.Forms.Timer();
             timer.Interval = settings.UpdateInterval;
             timer.Tick += (s, e) => UpdateTemperature();
 

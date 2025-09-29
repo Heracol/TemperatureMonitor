@@ -1,26 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
+using TemperatureMonitor;
 
-namespace TemperatureMonitor
-{
-    public class Program
-    {
-        static void Main(string[] args)
-        {
-            SetProcessDPIAware();
+SetProcessDPIAware();
 
-            Settings settings = Settings.Load();
+Settings settings = Settings.Load();
 
-            HardwareMonitor monitor = new HardwareMonitor();
+HardwareMonitor monitor = new HardwareMonitor();
 
-            TrayApp app = new TrayApp(monitor, settings);
+TrayApp app = new TrayApp(monitor, settings);
 
-            app.Start();
-        }
+app.Start();
 
-        [DllImport("user32.dll")]
-        private static extern bool SetProcessDPIAware();
-    }
-}
+[DllImport("user32.dll")]
+static extern bool SetProcessDPIAware();

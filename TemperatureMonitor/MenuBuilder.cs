@@ -11,10 +11,10 @@ namespace TemperatureMonitor
     {
         private readonly Settings settings;
         private readonly HardwareMonitor hardwareMonitor;
-        private readonly Timer timer;
+        private readonly System.Windows.Forms.Timer timer;
         private readonly Action update;
 
-        public MenuBuilder(Settings settings, HardwareMonitor hardwareMonitor, Timer timer, Action update)
+        public MenuBuilder(Settings settings, HardwareMonitor hardwareMonitor, System.Windows.Forms.Timer timer, Action update)
         {
             this.settings = settings;
             this.hardwareMonitor = hardwareMonitor;

@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.36401.2 d17.14
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TemperatureMonitor", "TemperatureMonitor\TemperatureMonitor.csproj", "{2952693D-1163-4F37-9E27-5E954A10D4B4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TemperatureMonitor", "TemperatureMonitor\TemperatureMonitor.csproj", "{76DCBD73-9AD6-4A44-83A7-4593D937C2E9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{2952693D-1163-4F37-9E27-5E954A10D4B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2952693D-1163-4F37-9E27-5E954A10D4B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2952693D-1163-4F37-9E27-5E954A10D4B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2952693D-1163-4F37-9E27-5E954A10D4B4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{76DCBD73-9AD6-4A44-83A7-4593D937C2E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76DCBD73-9AD6-4A44-83A7-4593D937C2E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76DCBD73-9AD6-4A44-83A7-4593D937C2E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76DCBD73-9AD6-4A44-83A7-4593D937C2E9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {2CA1C2BC-A71B-43F1-A5C6-F76BF4B41CA9}
+		SolutionGuid = {9C4368BE-0D4A-4299-9123-A8BE01B637BC}
 	EndGlobalSection
 EndGlobal

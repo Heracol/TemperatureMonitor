@@ -15,18 +15,18 @@ namespace TemperatureMonitor
 
         public static void SetAutoStart(bool enable)
         {
-            using (RegistryKey key = Registry.CurrentUser.OpenSubKey(RunKey, true))
+            using (RegistryKey? key = Registry.CurrentUser?.OpenSubKey(RunKey, true))
             {
                 if (enable)
-                    key.SetValue(AppName, Application.ExecutablePath);
+                    key?.SetValue(AppName, Application.ExecutablePath);
                 else
-                    key.DeleteValue(AppName, false);
+                    key?.DeleteValue(AppName, false);
             }
         }
 
         public static bool IsAutoStartEnabled()
         {
-            using (RegistryKey key = Registry.CurrentUser.OpenSubKey(RunKey, false))
+            using (RegistryKey? key = Registry.CurrentUser?.OpenSubKey(RunKey, false))
             {
                 return key?.GetValue(AppName) != null;
             }

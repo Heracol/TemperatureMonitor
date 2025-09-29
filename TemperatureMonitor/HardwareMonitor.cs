@@ -12,10 +12,10 @@ namespace TemperatureMonitor
         private readonly Computer computer;
 
         private IHardware cpu;
-        private ISensor cpuSensor;
+        private ISensor? cpuSensor;
 
-        private IHardware gpu;
-        private ISensor gpuSensor;
+        private IHardware? gpu;
+        private ISensor? gpuSensor;
 
         public bool HasGpu => gpu != null;
 
@@ -46,7 +46,7 @@ namespace TemperatureMonitor
         public float? GetCpuTemperature()
         {
             cpu.Update();
-            return cpuSensor.Value;
+            return cpuSensor?.Value;
         }
 
         public float? GetGpuTemperature()
@@ -55,7 +55,7 @@ namespace TemperatureMonitor
                 return null;
 
             gpu.Update();
-            return gpuSensor.Value;
+            return gpuSensor?.Value;
         }
 
         public void Close() => computer.Close();
