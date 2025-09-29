@@ -12,7 +12,11 @@ namespace TemperatureMonitor
 {
     public class Settings
     {
-        private const string filePath = "settings.json";
+        private static readonly string folderPath = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "TemperatureMonitor");
+
+        private static readonly string filePath = Path.Combine(folderPath, "settings.json");
 
         private bool showGpu = false;
         public bool ShowGpu
@@ -118,6 +122,8 @@ namespace TemperatureMonitor
         {
             try
             {
+                Directory.CreateDirectory(folderPath);
+
                 JsonSerializerOptions options = new JsonSerializerOptions { WriteIndented = true };
                 options.Converters.Add(new ColorJsonConverter());
 
