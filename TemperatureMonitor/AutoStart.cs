@@ -4,9 +4,10 @@ using System.Diagnostics;
 
 namespace TemperatureMonitor
 {
+    // Adds/removes program from Windows Task Scheduler
+    // Windows Task Scheduler - simple and allows program to be run as admin
     public static class AutoStart
     {
-        private const string RunKey = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run";
         private const string AppName = "TemperatureMonitor";
 
         public static void SetAutoStart(bool enable)

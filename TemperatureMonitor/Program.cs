@@ -2,6 +2,7 @@
 
 WindowsHelper.SetProcessDPIAware();
 
+// Needs admin privileges to read CPU temperature
 if (!WindowsHelper.IsRunningAdmin())
 {
     MessageBox.Show(

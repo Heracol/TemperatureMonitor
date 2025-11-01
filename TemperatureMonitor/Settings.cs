@@ -33,6 +33,7 @@ namespace TemperatureMonitor
             }
         }
 
+        // Must be one of the options from MenuBuilder
         private int updateInterval = 1000;
         public int UpdateInterval
         {
