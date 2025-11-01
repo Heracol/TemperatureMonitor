@@ -39,6 +39,19 @@ Settings are saved automatically, but you can also manually edit them in:
 
 `%AppData%\TemperatureMonitor\settings.json`
 
+Notes:
+
+- Enabling Start with Windows adds an entry in Task Scheduler.
+- To manually remove, open Task Scheduler => find Temperature Monitor => delete the entry.
+
+## Uninstall
+
+Uninstalling is simple:
+
+- Disable auto-start in the app if enabled.
+- Delete TemperatureMonitor.exe.
+- If auto-start wasn’t disabled, remove the Task Scheduler entry manually (see Configuration above).
+
 ## Project Overview
 
 This project is written in C# (.NET 8) using Windows Forms and LibreHardwareMonitor for reading sensor data.
