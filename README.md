@@ -16,7 +16,7 @@ It displays your CPU and GPU temperatures directly in the taskbar, with simple c
 
 ## How to Use
 
-1. Download the latest release from the Releases page.
+1. Download the latest release from the [Releases](https://github.com/Heracol/TemperatureMonitor/releases) page.
 2. Extract the ZIP file anywhere on your PC.
 3. Run TemperatureMonitor.exe.
 4. The current temperature will appear in your taskbar.
@@ -46,7 +46,7 @@ This project is written in C# (.NET 8) using Windows Forms and LibreHardwareMoni
 
 ## Bugs, Feedback, and Feature Requests
 
-If you encounter any bugs or issues, please open an issue in the Issues section.
+If you encounter any bugs or issues, please open an issue in the [Issues](https://github.com/Heracol/TemperatureMonitor/issues) section.
 
 You’re also welcome to:
 - Suggest new features
@@ -57,4 +57,4 @@ Every bit of feedback helps make the app better, thank you! 🙌
 
 ## Acknowledgements
 
-- LibreHardwareMonitor for hardware sensor access
+- [LibreHardwareMonitor](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor) for hardware sensor access
