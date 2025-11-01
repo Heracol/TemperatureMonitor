@@ -17,9 +17,8 @@ It displays your CPU and GPU temperatures directly in the taskbar, with simple c
 ## How to Use
 
 1. Download the latest release from the [Releases](https://github.com/Heracol/TemperatureMonitor/releases) page.
-2. Extract the ZIP file anywhere on your PC.
-3. Run TemperatureMonitor.exe.
-4. The current temperature will appear in your taskbar.
+2. Run TemperatureMonitor.exe.
+3. The current temperature will appear in your taskbar.
 
 You can right-click the icon to:
 
