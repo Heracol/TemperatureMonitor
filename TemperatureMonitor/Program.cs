@@ -1,5 +1,7 @@
 ﻿using TemperatureMonitor;
 
+CrashLog.SetupCrashLogging();
+
 WindowsHelper.SetProcessDPIAware();
 
 // Needs admin privileges to read CPU temperature
